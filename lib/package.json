@@ -1,0 +1,25 @@
+{
+    "name": "lib",
+    "version": "0.0.1",
+    "license": "MIT",
+    "type": "module",
+    "main": "index.js",
+    "scripts": {
+        "introspect": "prisma introspect",
+        "build": "prisma generate"
+    },
+    "devDependencies": {
+        "prisma": "^3.15.2"
+    },
+    "dependencies": {
+        "@prisma/client": "^3.15.2",
+        "got": "^12.1.0",
+        "got-scraping": "^3.2.9",
+        "hpagent": "^1.0.0",
+        "lodash": "^4.17.21",
+        "moment": "^2.29.3",
+        "node-html-parser": "^5.3.3",
+        "sleep-promise": "^9.1.0",
+        "tough-cookie": "^4.0.0"
+    }
+}

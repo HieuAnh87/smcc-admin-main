@@ -1,0 +1,30 @@
+{
+  "name": "libts",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "introspect": "prisma introspect",
+    "build": "prisma generate && tsc"
+  },
+  "devDependencies": {
+    "node-html-parser": "^6.1.5",
+    "prisma": "^3.15.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^3.15.2",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.0.3",
+    "got": "^11.8.2",
+    "got-scraping": "^3.2.9",
+    "hpagent": "^1.0.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.3",
+    "sleep-promise": "^9.1.0",
+    "tough-cookie": "^4.0.0"
+  },
+  "files": [
+    "lib"
+  ]
+}

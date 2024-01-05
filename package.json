@@ -1,0 +1,40 @@
+{
+    "private": true,
+    "name": "smcc-mono-repo",
+    "workspaces": [
+        "admin",
+        "api",
+        "crawler",
+        "lib",
+        "libts"
+    ],
+    "scripts": {
+        "api": "yarn workspace api start",
+        "admin": "yarn workspace admin start",
+        "crawler": "yarn workspace crawler start",
+        "lib": "yarn workspace lib build",
+        "up": "docker-compose up -d",
+        "prestart": "yarn up && yarn lib",
+        "start": "concurrently --kill-others-on-fail \"yarn api\"  \"yarn admin\""
+    },
+    "dependencies": {
+        "concurrently": "^7.2.2",
+        "cross-env": "^7.0.3",
+        "got": "^11.8.6",
+        "got-scraping": "^3.2.9",
+        "kafkajs": "^2.2.4",
+        "lodash": "^4.17.21",
+        "moment": "^2.29.3",
+        "postcss-minify-font-values": "^6.0.0",
+        "puppeteer": "^21.5.2",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-dropdown": "^1.11.0",
+        "react-select": "^5.7.7",
+        "recharts": "^2.9.0",
+        "socket.io": "^4.5.1",
+        "uuid": "^8.3.2",
+        "webrtc-adapter": "^8.2.3",
+        "xlsx": "^0.18.5"
+    }
+}

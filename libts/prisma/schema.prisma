@@ -1,0 +1,341 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model authors {
+  id                                         String              @id @default(dbgenerated("public.uuid_generate_v4()")) @db.VarChar(200)
+  link                                       String              @unique @db.VarChar(1000)
+  name                                       String              @db.VarChar(200)
+  avatar                                     String              @db.VarChar(1000)
+  gender                                     String?             @db.VarChar(10)
+  birthDate                                  DateTime?           @db.Date
+  address                                    String?             @db.VarChar(200)
+  contact                                    String?             @db.VarChar(200)
+  totalContent                               Int?                @default(0)
+  process                                    Boolean?            @default(false)
+  tagIds                                     String[]            @db.Uuid
+  profileIds                                 String[]            @db.Uuid
+  detailInfo                                 Json?               @db.Json
+  createdAt                                  DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt                                  DateTime            @default(now()) @db.Timestamptz(6)
+  latestContentId                            String?             @db.VarChar(200)
+  contents_authors_latestContentIdTocontents contents?           @relation("authors_latestContentIdTocontents", fields: [latestContentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  comments                                   comments[]
+  contents_authorsTocontents_authorId        contents[]          @relation("authorsTocontents_authorId")
+  wordpressContents                          wordpressContents[]
+}
+
+model campaigns {
+  id           String          @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  name         String          @db.VarChar(200)
+  type         CAMPAIGN_TYPE?
+  contentUrls  String[]        @db.VarChar(1000)
+  interactions Int             @default(10)
+  comments     String[]        @db.VarChar(1000)
+  status       CAMPAIGN_STATUS @default(CREATED)
+  runCount     Int             @default(0)
+  startedAt    DateTime?       @db.Timestamp(6)
+  endedAt      DateTime?       @db.Timestamp(6)
+  createdAt    DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime        @default(now()) @db.Timestamptz(6)
+}
+
+model contents {
+  id                                        String             @id @default(dbgenerated("public.uuid_generate_v4()")) @db.VarChar(2048)
+  sourceId                                  String             @db.VarChar(200)
+  authorId                                  String?            @db.VarChar(200)
+  topicIds                                  String[]           @db.VarChar(200)
+  link                                      String             @unique @db.VarChar(2048)
+  type                                      CONTENT_TYPE       @default(WEBSITE_POST)
+  textContent                               String             @db.VarChar
+  renderedContent                           String?            @db.VarChar
+  title                                     String?            @default("") @db.VarChar
+  imageContents                             Json?              @db.Json
+  videoContents                             Json?              @db.Json
+  likes                                     Int?               @default(0)
+  shares                                    Int?               @default(0)
+  comments                                  Int?               @default(0)
+  views                                     Int?               @default(0)
+  totalReactions                            Int?               @default(0)
+  reactionsPerHour                          Float?             @default(0) @db.Real
+  commentIds                                String[]           @db.VarChar(200)
+  status                                    STATUS?            @default(LIVE)
+  category                                  CONTENT_CATEGORY?  @default(TinKhac)
+  postedAt                                  DateTime?          @db.Timestamptz(6)
+  process                                   Boolean?           @default(false)
+  screenShot                                String?            @db.VarChar
+  tagIds                                    String[]           @db.Uuid
+  profileIds                                String[]           @db.Uuid
+  editedTextContent                         String?            @db.VarChar
+  violationContent                          String?            @db.VarChar
+  violationEnactment                        String?            @db.VarChar
+  meta                                      Decimal?           @db.Decimal
+  metaInfo                                  Json?              @db.Json
+  violationTimes                            String?            @db.VarChar(50)
+  userHandle                                String?            @default("notHandle") @db.VarChar(20)
+  blockRequire                              Boolean?           @default(false)
+  viettelBlocked                            Boolean?           @default(false)
+  fptBlocked                                Boolean?           @default(false)
+  vnptBlocked                               Boolean?           @default(false)
+  idTeleGroup                               Int?               @unique
+  contentTeleNoti                           String?            @default("") @db.VarChar(2000)
+  createdAt                                 DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt                                 DateTime           @default(now()) @db.Timestamptz(6)
+  authors_authorsTocontents_authorId        authors?           @relation("authorsTocontents_authorId", fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sources                                   sources            @relation(fields: [sourceId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  TopicsOnContents                          TopicsOnContents[]
+  authors_authors_latestContentIdTocontents authors[]          @relation("authors_latestContentIdTocontents")
+  comments_commentsTocontents               comments[]
+}
+
+model sources {
+  id                           String      @id @default(dbgenerated("public.uuid_generate_v4()")) @db.VarChar(200)
+  link                         String      @unique @db.VarChar(1000)
+  name                         String      @db.VarChar(200)
+  avatar                       String?     @db.VarChar(1000)
+  type                         SOURCE_TYPE @default(WEBSITE)
+  isCrawl                      Boolean?    @default(false)
+  metaInfo                     Json?       @db.Json
+  countDontHaveNegativeContent Int?        @default(0)
+  status                       STATUS      @default(LIVE)
+  isQuality                    Boolean?    @default(false)
+  accountId                    String?     @db.VarChar(200)
+  useProxy                     Boolean?    @default(false)
+  countCantAccess              Int?        @default(0)
+  lastCrawledAt                DateTime?   @default(dbgenerated("(now() - '2 days'::interval)")) @db.Timestamptz(6)
+  totalContent                 Int?        @default(0)
+  tagIds                       String[]    @db.Uuid
+  profileIds                   String[]    @db.Uuid
+  questionsToJoin              Json[]      @db.Json
+  createdAt                    DateTime    @default(now()) @db.Timestamptz(6)
+  updatedAt                    DateTime    @default(now()) @db.Timestamptz(6)
+  ranking                      Int?        @default(0)
+  categoryId                   String?     @db.VarChar(2048)
+  categories                   categories? @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  contents                     contents[]
+}
+
+model topics {
+  id                   String             @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  name                 String             @db.VarChar(200)
+  searchKeywords       String[]           @db.VarChar
+  keywords             Json[]             @db.Json
+  excludeKeywords      String[]           @db.VarChar
+  totalContent         Int?               @default(0)
+  likes                Int?               @default(0)
+  shares               Int?               @default(0)
+  comments             Int?               @default(0)
+  screenShot           Boolean?           @default(false)
+  isActiveCrawl        Boolean?           @default(false)
+  nextSearchGoogleAt   DateTime?          @default(dbgenerated("(now() + '00:15:00'::interval)")) @db.Timestamptz(6)
+  nextSearchFacebookAt DateTime?          @default(dbgenerated("(now() + '00:15:00'::interval)")) @db.Timestamptz(6)
+  nextSearchYoutubeAt  DateTime?          @default(dbgenerated("(now() + '00:15:00'::interval)")) @db.Timestamptz(6)
+  intervalSearch       Int?               @default(900000)
+  createdAt            DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime           @default(now()) @db.Timestamptz(6)
+  lastSearchAt         DateTime?          @db.Timestamptz(6)
+  TopicsOnContents     TopicsOnContents[]
+}
+
+model comments {
+  id           String    @id @db.VarChar(200)
+  authorId     String    @db.VarChar(200)
+  contentId    String    @db.VarChar(200)
+  textContent  String?   @db.VarChar
+  imageContent String?   @db.VarChar(1000)
+  videoContent String?   @db.VarChar(1000)
+  link         String    @unique @db.VarChar(1000)
+  likes        Int?
+  status       STATUS?   @default(LIVE)
+  postedAt     DateTime? @db.Timestamp(6)
+  createdAt    DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @db.Timestamptz(6)
+  authors      authors   @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  contents     contents  @relation(fields: [contentId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_content")
+}
+
+model tags {
+  id         String   @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  name       String   @db.VarChar(200)
+  showOnPost Boolean? @default(false)
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model tokens {
+  id          String   @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  userId      String   @db.Uuid
+  accessToken String   @unique @db.VarChar(200)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model users {
+  id            String         @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  name          String         @db.VarChar(200)
+  email         String         @unique @db.VarChar(200)
+  password      String         @db.VarChar(200)
+  roles         USER_ROLES[]
+  workTime      String?        @db.VarChar(30)
+  gender        String         @db.VarChar(10)
+  telephone     String?        @db.VarChar(15)
+  lock          Boolean?       @default(false)
+  createdAt     DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime       @default(now()) @db.Timestamptz(6)
+  settingNotify settingNotify?
+}
+
+model history {
+  id          String   @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  userId      String?  @db.Uuid
+  screen      String?  @db.VarChar(50)
+  description String?  @db.VarChar
+  teleInfo    Json?    @db.Json
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model profiles {
+  id          String   @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  name        String   @db.VarChar(200)
+  description String?  @db.VarChar
+  sourceIds   String[] @db.VarChar(200)
+  authorIds   String[] @db.VarChar(200)
+  contentIds  String[] @db.VarChar(200)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model TopicsOnContents {
+  contentId String   @db.VarChar(2048)
+  topicId   String   @db.Uuid
+  contents  contents @relation(fields: [contentId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  topics    topics   @relation(fields: [topicId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([topicId, contentId], map: "_TopicsOnContents_topic_content_unique")
+  @@index([contentId], map: "_TopicsOnContents_content_index")
+  @@map("_TopicsOnContents")
+}
+
+model fbAccounts {
+  id         String    @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  fbId       String    @default("") @db.VarChar(200)
+  link       String?   @db.VarChar(1000)
+  name       String?   @db.VarChar(200)
+  email      String?   @db.VarChar(200)
+  password   String    @db.VarChar(200)
+  status     STATUS?   @default(WAITING)
+  cookies    String?   @db.VarChar(50000)
+  token      String?   @db.VarChar(200)
+  location   String?   @db.VarChar(200)
+  otp        String?   @db.VarChar(200)
+  proxy      String?   @db.VarChar(200)
+  device     String?   @db.VarChar(200)
+  avatar     String?   @db.VarChar(1000)
+  phone      String?   @db.VarChar(15)
+  groupIds   String[]  @db.VarChar(20)
+  targetIds  String[]  @db.VarChar(200)
+  meta       Json?     @db.Json
+  errorType  String?   @db.VarChar(200)
+  firstRunAt DateTime? @db.Timestamptz(6)
+  lastRunAt  DateTime? @db.Timestamptz(6)
+  createdAt  DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime  @default(now()) @db.Timestamptz(6)
+}
+
+model notifications {
+  id                  String   @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  type                String   @db.VarChar(50)
+  userId              String   @db.Uuid
+  notifycationContent String   @db.VarChar
+  contentIds          String[] @db.VarChar(200)
+  seen                Boolean? @default(false)
+  createdAt           DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model settingNotify {
+  id                         String   @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  userId                     String   @unique @db.Uuid
+  telegram                   String?  @db.VarChar(50)
+  email                      String?  @db.VarChar(100)
+  webapp                     Boolean? @default(false)
+  totalContentOnNotification Int?     @default(5)
+  notifyInWorkTime           Boolean? @default(true)
+  createdAt                  DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt                  DateTime @default(now()) @db.Timestamptz(6)
+  users                      users    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user")
+}
+
+model wordpressContents {
+  id          String   @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  title       String   @db.VarChar
+  image       String   @db.VarChar
+  content     String   @db.VarChar
+  authorId    String   @db.VarChar(200)
+  url         String?  @unique @db.VarChar
+  targetUrl   String?  @db.VarChar
+  detailInfor Json?    @db.Json
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @db.Timestamptz(6)
+  authors     authors  @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_wordpress_content")
+}
+
+model categories {
+  id      String    @id @default(dbgenerated("public.uuid_generate_v4()")) @db.VarChar(2048)
+  name    String?   @db.VarChar
+  sources sources[]
+}
+
+enum CAMPAIGN_STATUS {
+  CREATED
+  RUNNING
+  LOST
+  SUCCESS
+}
+
+enum CAMPAIGN_TYPE {
+  COMMENT
+  REPORT
+}
+
+enum CONTENT_TYPE {
+  WEBSITE_POST
+  FB_POST
+  YOUTUBE
+}
+
+enum CONTENT_CATEGORY {
+  ChongPhaDangNhaNuoc
+  ChongPhaQuanDoi
+  KhacLienQuanQuanDoi
+  LotLoTaiLieu
+  TinKhac
+}
+
+enum SOURCE_TYPE {
+  WEBSITE
+  GOOGLE_SEARCH_WEBSITE
+  FB_PAGE
+  FB_GROUP
+  FB_ACCOUNT
+  YOUTUBE
+}
+
+enum STATUS {
+  LIVE
+  DEAD
+  WAITING
+  ERROR
+}
+
+enum USER_ROLES {
+  SUPER_ADMIN
+  MANAGER
+}
