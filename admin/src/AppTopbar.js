@@ -8,7 +8,7 @@ export const AppTopbar = (props) => {
     <div className="layout-topbar">
       <Link to="/" className="layout-topbar-logo">
       <img src={logoImage} alt="App Logo" />
-        <span>Du lịch thông minh</span>
+        <span>SmartTravel</span>
       </Link>
 
       <button type="button" className="p-link  layout-menu-button layout-topbar-button" onClick={props.onToggleMenuClick}>
